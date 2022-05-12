@@ -66,15 +66,14 @@
             if (choice !== undefined) {
                 if (choice == "exit") { return; }
 
-                if (play.node.afterText !== undefined) {
-                    for (const text of play.node.afterText) {
-                        IO.output(text);
-                    }
-                }
-
                 let notFound = true;
                 for (const option of play.node.options) {
                     if (option[0] == choice) {
+                    	if (play.node.afterText !== undefined) {
+                            for (const text of play.node.afterText) {
+                                IO.output(text);
+                            }
+                        }
                         play.node = option[2];
                         notFound = false;
                         break;
