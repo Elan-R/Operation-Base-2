@@ -1,1 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Base Creater</title>
+    </head>
+    <label for="name">Name:</label>
+    <textarea id="name"></textarea>
+    <label for="text">Text:</label>
+    <textarea id="text"></textarea>
+    <button id="addText">Add Text</button>
+    <label for="option">Option:</label>
+    <textarea id="option"></textarea>
+    <button id="addOption">Add Option</button>
+    <label for="afterText">After text:</label>
+    <textarea id="afterText"></textarea>
+    <button id="addAfterText">Add After Text</button>
+    <button id="enter">Enter</button>
+    <script>
+        let nodes = [];
+        
+        function toJson(n) {
 
+        }
+
+        function Node(name, text, options, afterText) {
+            return {
+                "name": name,
+                "text": text,
+                "options": options,
+                "afterText": afterText
+            };
+        }
+
+        function addNode(name, text, options, afterText) {
+            nodes.push(Node(name, text, options, afterText));
+        }
+
+        
+
+    </script>
+</html>
