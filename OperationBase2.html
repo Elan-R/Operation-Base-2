@@ -59,14 +59,11 @@
                 }
             }
 
-            console.log(play.node)
-
             playNode();
         }
 
         function playNode(choice) {
             if (choice !== undefined) {
-                console.log(choice)
                 if (choice == "exit") { return; }
 
                 if (play.node.afterText !== undefined) {
@@ -79,7 +76,6 @@
                 for (const option of play.node.options) {
                     if (option[0] == choice) {
                         play.node = option[2];
-                        console.log(option)
                         notFound = false;
                         break;
                     }
@@ -102,15 +98,15 @@
                     IO.output(option[0] + ": " + option[1]);
                 }
                 IO.output("\n");
+                
+                IO.input();
             }
-
-            IO.input();
         }
 
     </script>
     <input id="input" disabled>
     <button id="submit" disabled>Enter</button>
-    <ul id="output"></ul>
+    <div id="output" style="width: 500px; height: 300px; overflow: auto;"></div>
     <script>
         let source = `{
             "nodes": [
@@ -125,7 +121,6 @@
                         ["2", "continue down the road", "road"]
                     ]
                 },
-
                 {
                     "name": "farm",
                     "text": [
@@ -138,7 +133,6 @@
                     ],
                     "after text": ["You hear a sound behind you and hurry along"]
                 },
-
                 {
                     "name": "road",
                     "text": [
@@ -150,7 +144,6 @@
                         ["2", "head into the forest", "end game"]
                     ]
                 },
-
                 {
                     "name": "end game",
                     "text": ["game demo over!"],
@@ -159,7 +152,6 @@
                         ["2", "quit", "end"]
                     ]
                 },
-
                 {
                     "name": "end"
                 }
@@ -167,33 +159,42 @@
         }`;
     </script>
     <script>
-        let list = document.getElementById("output");
+        let outputBox = document.getElementById("output");
         let inputBox = document.getElementById("input");
         let submitButton = document.getElementById("submit");
         
         IO.output = (str) => {
-            let line = document.createElement("li");
-            line.appendChild(document.createTextNode(str));
-            list.appendChild(line);
+            outputBox.innerHTML += str.replace("\n", "<br>") + "<br>";
+            outputBox.scrollTop = outputBox.scrollHeight;
         }
 
         IO.reading = false;
 
         IO.input = () => {
-            console.log("input");
             IO.reading = true;
             inputBox.disabled = false;
             submitButton.disabled = false;
+           	inputBox.focus();
+            inputBox.select();
         }
-
-        submitButton.onclick = () => {
+        
+        function enter() {
             if (IO.reading) {
                 IO.reading = false;
                 submitButton.disabled = true;
                 inputBox.disabled = true;
                 playNode(inputBox.value);
+                inputBox.value = "";
             }
         }
+
+        submitButton.onclick = enter;
+        
+        inputBox.addEventListener("keyup", (e) => {
+        	if (e.key == "Enter") {
+            	enter();
+            }
+        });
 
         if (typeof source != "undefined" && source != null) {
             play(parse(source));
