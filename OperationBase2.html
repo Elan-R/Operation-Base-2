@@ -13,14 +13,14 @@
                 "text": text,
                 "options": options,
                 "afterText": afterText
-            }
+            };
         }
 
         function parse(str) {
             const source = JSON.parse(str)["nodes"];
-            let nodes = []
+            let nodes = [];
             for (const node of source) {
-                nodes.push(Node(node["name"], node["text"], node["options"], node["after text"]))
+                nodes.push(Node(node["name"], node["text"], node["options"], node["after text"]));
             }
             for (const node of nodes) {
                 if (node.options === undefined) { continue; }
@@ -48,7 +48,7 @@
         let IO = {
             "output": (str) => undefined,
             "input": () => undefined
-        }
+        };
 
         function play(nodes, start) {
             if (start === undefined) { start = "start"; }
