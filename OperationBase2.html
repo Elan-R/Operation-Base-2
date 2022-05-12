@@ -1,12 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Operation Base 2</title>
-  </head>
-  <body>
-	<script src="OperationBase2.js"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Operation Base 2</title>
+    </head>
+    <script>
+        function Node(name, text, options, afterText) {
+            return {
+                "name": name,
+                "text": text,
+                "options": options,
+                "afterText": afterText
+            }
+        }
+
+        function parse(str) {
+            const source = JSON.parse(str)["nodes"];
+            let nodes = []
+            for (const node of source) {
+                nodes.push(Node(node["name"], node["text"], node["options"], node["after text"]))
+            }
+            for (const node of nodes) {
+                if (node.options === undefined) { continue; }
+                for (const option of node.options) {
+                    let next = option[2];
+                    for (const n of nodes) {
+                        if (n.name == next) {
+                            option[2] = n;
+                            break;
+                        }
+                    }
+                }
+            }
+            return nodes;
+        }
+
+        function loadFile(file) {
+            let contents;
+            const reader = new FileReader();
+            reader.addEventListener("load", () => contents = reader.result);
+            reader.readAsText(str);
+            return contents;
+        }
+
+        let IO = {
+            "output": (str) => undefined,
+            "input": () => undefined
+        }
+
+        function play(nodes, start) {
+            if (start === undefined) { start = "start"; }
+            play.node = null;
+            for (const n of nodes) {
+                if (n.name == start) {
+                    play.node = n;
+                }
+            }
+
+            console.log(play.node)
+
+            playNode();
+        }
+
+        function playNode(choice) {
+            if (choice !== undefined) {
+                console.log(choice)
+                if (choice == "exit") { return; }
+
+                if (play.node.afterText !== undefined) {
+                    for (const text of play.node.afterText) {
+                        IO.output(text);
+                    }
+                }
+
+                let notFound = true;
+                for (const option of play.node.options) {
+                    if (option[0] == choice) {
+                        play.node = option[2];
+                        console.log(option)
+                        notFound = false;
+                        break;
+                    }
+                }
+                if (notFound) {
+                    IO.input();
+                    return;
+                }
+            }
+
+            if (play.node.text !== undefined) {
+                for (const text of play.node.text) {
+                    IO.output(text);
+                }
+            }
+
+            if (play.node.options !== undefined) {
+                IO.output("What do you do?\n\n");
+                for (const option of play.node.options) {
+                    IO.output(option[0] + ": " + option[1]);
+                }
+                IO.output("\n");
+            }
+
+            IO.input();
+        }
+
+    </script>
+    <input id="input" disabled>
+    <button id="submit" disabled>Enter</button>
+    <ul id="output"></ul>
+    <script>
+        let source = `{
+            "nodes": [
+                {
+                    "name": "start",
+                    "text": [
+                        "you're walking along a dirt road",
+                        "you come across a farm"
+                    ],
+                    "options": [
+                        ["1", "go to the farm", "farm"],
+                        ["2", "continue down the road", "road"]
+                    ]
+                },
+
+                {
+                    "name": "farm",
+                    "text": [
+                        "you walk up the road leading to the house",
+                        "in front of you is the farmhouse. to your left is a field of wheat"
+                    ],
+                    "options": [
+                        ["1", "go in the house", "end game"],
+                        ["2", "explore the field", "end game"]
+                    ],
+                    "after text": ["You hear a sound behind you and hurry along"]
+                },
+
+                {
+                    "name": "road",
+                    "text": [
+                        "you follow the dirt road into a dark forest",
+                        "you hear sounds to your left and right"
+                    ],
+                    "options": [
+                        ["1", "stay on the road", "end game"],
+                        ["2", "head into the forest", "end game"]
+                    ]
+                },
+
+                {
+                    "name": "end game",
+                    "text": ["game demo over!"],
+                    "options": [
+                        ["1", "play again", "start"],
+                        ["2", "quit", "end"]
+                    ]
+                },
+
+                {
+                    "name": "end"
+                }
+            ]
+        }`;
+    </script>
+    <script>
+        let list = document.getElementById("output");
+        let inputBox = document.getElementById("input");
+        let submitButton = document.getElementById("submit");
+        
+        IO.output = (str) => {
+            let line = document.createElement("li");
+            line.appendChild(document.createTextNode(str));
+            list.appendChild(line);
+        }
+
+        IO.reading = false;
+
+        IO.input = () => {
+            console.log("input");
+            IO.reading = true;
+            inputBox.disabled = false;
+            submitButton.disabled = false;
+        }
+
+        submitButton.onclick = () => {
+            if (IO.reading) {
+                IO.reading = false;
+                submitButton.disabled = true;
+                inputBox.disabled = true;
+                playNode(inputBox.value);
+            }
+        }
+
+        if (typeof source != "undefined" && source != null) {
+            play(parse(source));
+        }
+    </script>
 </html>
